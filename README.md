@@ -7,3 +7,6 @@ initialize a Node.js project - in the terminal run 'npm init -y' which will inst
 install mySQL - brew install mySQL
     - start the sql service - brew services start mysql
     - check status of mySQL service - brew servies list
+
+instal cli-Table3 package for displaying tables 
+    - npm install cli-table3
