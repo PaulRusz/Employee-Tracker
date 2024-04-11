@@ -1,8 +1,18 @@
 // Required modules
 const { Pool } = require('pg')
 const inquirer = require('inquirer')
+const fs = require('fs')
+
 
 const Table = require('cli-table3')
+
+const db = require('./db')
+const filePath = './db/query.sql'
+const filePathTwo = './schema.sql'; // Path to your SQL file
+
+
+// connects with ds.js
+const { executeQueriesFromFile } = require('./db.js')
 
 
 // 
@@ -21,6 +31,9 @@ pool.query('SELECT * FROM users', (error, results) => {
         console.log('Query results:', results.rows)
     }
 })
+
+// Executes SQL queries from the query.sql file
+db.executeQueriesFromFile(pool, filePath);
 
 
 // Initialize an empty stack to store menu history
