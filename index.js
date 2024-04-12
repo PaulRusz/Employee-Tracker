@@ -2,18 +2,22 @@
 const { Pool } = require('pg')
 const inquirer = require('inquirer')
 const fs = require('fs')
+const express = require('express')
 
 
 const Table = require('cli-table3')
 
-const db = require('./db')
-const filePath = './db/query.sql'
-const filePathTwo = './db/schema.sql'; // Path to your SQL file
+//const db = require('./db')
+//const filePath = ('./db/query.sql')
+//const filePathTwo = ('./db/schema.sql'); // Path to your SQL file
 
 
 // connects with ds.js
-const { executeQueriesFromFile } = require('./db.js')
+//const { executeQueriesFromFile } = require('./db.js')
 
+
+// Express middleware
+const app = express()
 
 // 
 const pool = new Pool({
@@ -33,8 +37,9 @@ pool.query('SELECT * FROM users', (error, results) => {
 })
 
 // Executes SQL queries from the query.sql file
-db.executeQueriesFromFile(pool, filePath);
-db.executeQueriesFromFile(pool, filePathTwo);
+//db.executeQueriesFromFile(pool, filePath);
+//db.executeQueriesFromFile(pool, filePathTwo);
+//executeQueriesFromFile()
 
 
 // Initialize an empty stack to store menu history
@@ -97,15 +102,27 @@ function handleUserChoices(answers) {
 }
 
 
+// Displays all departments
+const departments = [
+    { id: 1, name: "Finance" },
+    { id: 2, name: "Sales" },
+    { id: 3, name: "Software" },
+];
+// Displays all roles
+const roles = [
+    { id: 1, role: "Lawyer", department: "Software", salary: "$10,000" },
+    { id: 2, role: "Office Manager", department: "Finance", salary: "$10,000" }
+]
+// Displays all employees
+const employees = [
+    { id: 1, firstName: "Paul", lastName: "Berkley", jobTitle: "Lawyer", department: "Software", reportingManager: "Sue Chrysler" },
+    { id: 2, firstName: "Travis", lastName: "Stewart", jobTitle: "Office Manager", department: "Finance", reportingManager: "Christian Taylor" }
+]
+
+
 
 // Departments
 function displayDepartments() {
-    // Displays all departments
-    const departments = [
-        { id: 1, name: "Finance" },
-        { id: 2, name: "Sales" },
-        { id: 3, name: "Software" },
-    ];
 
     // Creates a new table to view Departments
     const departmentTable = new Table({
@@ -125,11 +142,6 @@ function displayDepartments() {
 
 // Roles
 function displayRoles() {
-    // Displays all roles
-    const roles = [
-        { id: 1, role: "Lawyer", department: "Software", salary: "$10,000" },
-        { id: 2, role: "Office Manager", department: "Finance", salary: "$10,000" }
-    ]
 
     // Creates a table to view the roles
     const roleTable = new Table({
@@ -147,11 +159,6 @@ function displayRoles() {
 
 // Employees
 function displayEmployees() {
-    // Displays all employees
-    const employees = [
-        { id: 1, firstName: "Paul", lastName: "Berkley", jobTitle: "Lawyer", department: "Software", reportingManager: "Sue Chrysler" },
-        { id: 2, firstName: "Travis", lastName: "Stewart", jobTitle: "Office Manager", department: "Finance", reportingManager: "Christian Taylor" }
-    ]
 
     // Creates table to view employees
     const employeeTable = new Table({
@@ -284,3 +291,29 @@ function updateRole(employeeId, newRoleId) {
 
 // Calls the Main Menu
 displayMainMenu();
+
+
+
+
+
+
+
+// do i need this?
+// const fs = require('fs');
+
+// function executeQueriesFromFile(db, filePath) {
+//     const sqlQueries = fs.readFileSync(filePath, 'utf8').split(';');
+//     sqlQueries.forEach((query) => {
+//         db.query(query, (err, result) => {
+//             if (err) {
+//                 console.error('Error executing query:', err);
+//             } else {
+//                 console.log('Query executed successfully.');
+//             }
+//         });
+//     });
+// }
+
+// module.exports = {
+//     executeQueriesFromFile,
+// };

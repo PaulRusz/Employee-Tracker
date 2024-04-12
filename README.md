@@ -9,3 +9,5 @@ install Postgres
 
 instal cli-Table3 package for displaying tables 
     - npm install cli-table3
+
+    install express

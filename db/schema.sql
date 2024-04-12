@@ -1,3 +1,10 @@
+DROP DATABASE IF EXISTS employees_db;
+-- Creates the "employees_db" database --
+CREATE DATABASE employees_db;
+
+-- Makes it so all of the following code will affect employees_db --
+\c employees_db;
+
 
 -- Creates user table
 CREATE TABLE users (
