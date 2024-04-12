@@ -149,7 +149,7 @@ function displayRoles() {
         colWidths: [10, 20]
     })
     roles.forEach(role => {
-        roleTable.push([role.id, role.role])
+        roleTable.push([role.id, role.role, role.department, role.salary])
     })
 
     console.log(roleTable.toString())
@@ -289,9 +289,9 @@ function updateRole(employeeId, newRoleId) {
 
 
 
+
 // Calls the Main Menu
 displayMainMenu();
-
 
 
 
