@@ -28,11 +28,11 @@ const pool = new Pool({
     port: 5432,
 })
 
-pool.query('SELECT * FROM users', (error, results) => {
+pool.query('SELECT * FROM departments', (error, results) => {
     if (error) {
         console.error('Error executing query', error)
     } else {
-        console.log('Query results:', results.rows)
+        console.table('Query results:', results.rows)
     }
 })
 
@@ -177,6 +177,16 @@ function displayEmployees() {
 // Adds a department to the database
 function addDepartment() {
 
+    const departmentTable = new Table({
+        head: ['ID', 'Department Name'],
+        colWidths: [10, 20]
+    })
+
+    // Populate the table with department data
+    departments.forEach(department => {
+        departmentTable.push([department.id, department.name])
+    })
+
     inquirer.prompt([
         {
             name: 'departmentName',
@@ -189,8 +199,19 @@ function addDepartment() {
             name: answers.departmentName
         }
 
+        pool.query(`INSERT INTO departments (name) VALUES ('${answers.departmentName}')`, (error, results) => {
+            if (error) {
+                console.error('Error executing query', error)
+            } else {
+                console.table('Query results:', results.rows)
+            }
+        })
+
         departments.push(newDepartment)
+        departmentTable.push(newDepartment)
         console.log(`The department ${newDepartment.name} has been added.`)
+
+        console.log(departmentTable.toString())
     })
 }
 
