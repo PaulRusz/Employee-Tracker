@@ -7,15 +7,6 @@ const express = require('express');
 
 const Table = require('cli-table3');
 
-//const db = require('./db')
-//const filePath = ('./db/query.sql')
-//const filePathTwo = ('./db/schema.sql'); // Path to your SQL file
-
-
-// connects with ds.js
-//const { executeQueriesFromFile } = require('./db.js')
-
-
 // Express middleware
 const app = express();
 
@@ -28,51 +19,23 @@ const pool = new Pool({
     port: 5432,
 });
 
-pool.query('SELECT NOW()', (err, res) => {
-    if (err) {
-        console.error('Error executing query', err);
-    } else {
-        console.log('Connected to database:', res.rows[0].now);
-    }
+pool.connect();
+
+pool.connect(err => {
+    if (err) throw err;
+    console.log('connected as id ' + pool.threadId);
+    afterConnection();
 });
 
-pool.query('SELECT * FROM departments', (error, results) => {
-    if (error) {
-        console.error('Error executing query', error)
-    } else {
-        console.table('Query results:', results.rows)
-    }
-});
-
-// Function to execute queries from a file
-const executeQueriesFromFile = (pool, filePath) => {
-    try {
-        // Read the SQL file
-        const sqlQuery = fs.readFileSync(filePath, 'utf8');
-
-        // Execute the query
-        pool.query(sqlQuery, (error, results) => {
-            if (error) {
-                console.error('Error executing query', error);
-            } else {
-                console.table('Query results:', results.rows);
-            }
-        });
-    } catch (error) {
-        console.error('Error reading file:', error);
-    }
+// function after connection is established and welcome image shows 
+afterConnection = () => {
+    console.log("***********************************")
+    console.log("*                                 *")
+    console.log("*        EMPLOYEE MANAGER         *")
+    console.log("*                                 *")
+    console.log("***********************************")
+    displayMainMenu();
 };
-
-// Define file paths
-const queryFilePath = './db/query.sql';
-const schemaFilePath = './db/schema.sql';
-const seedsFilePath = './db/seeds.sql';
-
-// Execute queries from query.sql and schema.sql files
-executeQueriesFromFile(pool, queryFilePath);
-executeQueriesFromFile(pool, schemaFilePath);
-executeQueriesFromFile(pool, seedsFilePath);
-
 
 // Initialize an empty stack to store menu history
 const menuHistory = [];
@@ -177,7 +140,7 @@ function displayRoles() {
 
     // Creates a table to view the roles
     const roleTable = new Table({
-        head: ['ID', 'Role', 'Department', 'Salary'],
+        head: ['ID', 'Role', 'Department Name', 'Salary'],
         colWidths: [10, 20]
     })
     roles.forEach(role => {
@@ -209,15 +172,15 @@ function displayEmployees() {
 // Adds a department to the database
 function addDepartment() {
 
-    const departmentTable = new Table({
-        head: ['ID', 'Department Name'],
-        colWidths: [10, 20]
-    })
+    // const departmentTable = new Table({
+    //     head: ['ID', 'Department Name'],
+    //     colWidths: [10, 20]
+    // })
 
     // Populate the table with department data
-    departments.forEach(department => {
-        departmentTable.push([department.id, department.name])
-    })
+    // departments.forEach(department => {
+    //     departmentTable.push([department.id, department.name])
+    // })
 
     inquirer.prompt([
         {
@@ -226,24 +189,24 @@ function addDepartment() {
             message: 'Enter the name of the new department'
         }
     ]).then((answers) => {
-        const newDepartment = {
-            id: departments.length + 1,
-            name: answers.departmentName
-        }
+        // const newDepartment = {
+        //     //id: departments.length + 1,
+        //     name: answers.departmentName
+        // }
 
-        pool.query(`INSERT INTO departments (name) VALUES ('${answers.departmentName}')`, (error, results) => {
+        pool.query(`INSERT INTO departments (department_name) VALUES ('${answers.departmentName}')`, (error, results) => {
             if (error) {
                 console.error('Error executing query', error)
             } else {
-                console.table('Query results:', results.rows)
+                console.table('Success! New Department has been added.', results.rows)
             }
         })
 
-        departments.push(newDepartment)
-        departmentTable.push(newDepartment)
-        console.log(`The department ${newDepartment.name} has been added.`)
+        // departments.push(newDepartment)
+        // departmentTable.push(newDepartment)
+        // console.log(`The department ${newDepartment.name} has been added.`)
 
-        console.log(departmentTable.toString())
+        // console.log(departmentTable.toString())
     })
 }
 
@@ -251,7 +214,6 @@ function addDepartment() {
 
 // Adds a role to the database
 function addRole() {
-
     inquirer.prompt([
         {
             name: 'roleName',
@@ -259,30 +221,31 @@ function addRole() {
             message: "Enter the new role's name:",
         },
         {
+            name: 'roleDepartment',
+            type: 'input',
+            message: "Enter the department the role will be a part of:"
+        },
+        {
             name: 'roleSalary',
             type: 'input',
             message: "Enter the role's salary:"
         },
-        {
-            name: 'roleDepartment',
-            type: 'input',
-            message: "Enter the department the role will be a part of:"
-        }
-
-
     ]).then((answers) => {
         const newRole = {
-            id: roles.length + 1,
-            name: answers.roleName,
+            title: answers.roleName,
             salary: answers.roleSalary,
             department: answers.roleDepartment
         }
 
-        roles.push(newRole)
-        console.log(`The role ${newRole.name} with a salary of ${newRole.salary} has been added to the ${newRole.department}.`)
+        pool.query(`INSERT INTO roles (title, salary, department_id) VALUES ('${newRole.title}', ${newRole.salary}, ${newRole.department})`, (error, results) => {
+            if (error) {
+                console.error('Error executing query', error)
+            } else {
+                console.table('Success!  New Role has been added.', [results.rows])
+            }
+        })
     })
 }
-
 
 
 // Adds an employee to the database
@@ -319,7 +282,15 @@ function addEmployee() {
             manager: answers.employeeManager
         }
 
-        roles.push(newEmployee)
+        // roles.push(newEmployee)
+
+        pool.query(`INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ('${newEmployee.firstName}', '${newEmployee.lastName}', '${newEmployee.role}', '${newEmployee.manager}')`, (error, results) => {
+            if (error) {
+                console.error('Error executing query', error)
+            } else {
+                console.table('Success!  New Employee data has been added.', [results.rows])
+            }
+        })
         console.log('New employee added!')
     })
 }
@@ -344,7 +315,7 @@ function updateRole(employeeId, newRoleId) {
 
 
 // Calls the Main Menu
-displayMainMenu();
+//displayMainMenu();
 
 
 
