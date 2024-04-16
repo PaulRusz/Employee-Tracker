@@ -1,11 +1,11 @@
 // Required modules
-const { Pool } = require('pg')
-const inquirer = require('inquirer')
-const fs = require('fs')
-const express = require('express')
+const { Pool } = require('pg');
+const inquirer = require('inquirer');
+const fs = require('fs');
+const express = require('express');
 
 
-const Table = require('cli-table3')
+const Table = require('cli-table3');
 
 //const db = require('./db')
 //const filePath = ('./db/query.sql')
@@ -17,7 +17,7 @@ const Table = require('cli-table3')
 
 
 // Express middleware
-const app = express()
+const app = express();
 
 // 
 const pool = new Pool({
@@ -26,7 +26,15 @@ const pool = new Pool({
     password: "Ptr199101!",
     database: 'employee_tracker_db',
     port: 5432,
-})
+});
+
+pool.query('SELECT NOW()', (err, res) => {
+    if (err) {
+        console.error('Error executing query', err);
+    } else {
+        console.log('Connected to database:', res.rows[0].now);
+    }
+});
 
 pool.query('SELECT * FROM departments', (error, results) => {
     if (error) {
@@ -34,12 +42,36 @@ pool.query('SELECT * FROM departments', (error, results) => {
     } else {
         console.table('Query results:', results.rows)
     }
-})
+});
 
-// Executes SQL queries from the query.sql file
-//db.executeQueriesFromFile(pool, filePath);
-//db.executeQueriesFromFile(pool, filePathTwo);
-//executeQueriesFromFile()
+// Function to execute queries from a file
+const executeQueriesFromFile = (pool, filePath) => {
+    try {
+        // Read the SQL file
+        const sqlQuery = fs.readFileSync(filePath, 'utf8');
+
+        // Execute the query
+        pool.query(sqlQuery, (error, results) => {
+            if (error) {
+                console.error('Error executing query', error);
+            } else {
+                console.table('Query results:', results.rows);
+            }
+        });
+    } catch (error) {
+        console.error('Error reading file:', error);
+    }
+};
+
+// Define file paths
+const queryFilePath = './db/query.sql';
+const schemaFilePath = './db/schema.sql';
+const seedsFilePath = './db/seeds.sql';
+
+// Execute queries from query.sql and schema.sql files
+executeQueriesFromFile(pool, queryFilePath);
+executeQueriesFromFile(pool, schemaFilePath);
+executeQueriesFromFile(pool, seedsFilePath);
 
 
 // Initialize an empty stack to store menu history
