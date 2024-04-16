@@ -16,6 +16,8 @@ The Employee Tracker allows a company to keep track of their employees.  This is
 The user should clone the repository from GitHub. 
 This application requires Node.js, Inquirer, and console.table. 
 
+The user can access the application and start it bby using 'node index.js'
+
 
 ## Usage
 This application will allow users to view, add, and edit employees, roles, departments, and managers.
@@ -27,10 +29,13 @@ N/A
 
 ## Links
 Repo:  
-https://github.com/PaulRusz/LogoCreator
+https://github.com/PaulRusz/Employee-Tracker
 
 Instructional Video:  
-https://drive.google.com/file/d/19UgsJgxBatW1ml2LMwDjz_QueglyC33i/view
+https://drive.google.com/file/d/1G1H3BsPda6NbvcfmHF7ETXcMi2-0k7a3/view
+
+GitHub:
+https://github.com/PaulRusz
 
 
 ## License
