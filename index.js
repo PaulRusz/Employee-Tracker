@@ -172,16 +172,6 @@ function displayEmployees() {
 // Adds a department to the database
 function addDepartment() {
 
-    // const departmentTable = new Table({
-    //     head: ['ID', 'Department Name'],
-    //     colWidths: [10, 20]
-    // })
-
-    // Populate the table with department data
-    // departments.forEach(department => {
-    //     departmentTable.push([department.id, department.name])
-    // })
-
     inquirer.prompt([
         {
             name: 'departmentName',
@@ -189,10 +179,6 @@ function addDepartment() {
             message: 'Enter the name of the new department'
         }
     ]).then((answers) => {
-        // const newDepartment = {
-        //     //id: departments.length + 1,
-        //     name: answers.departmentName
-        // }
 
         pool.query(`INSERT INTO departments (department_name) VALUES ('${answers.departmentName}')`, (error, results) => {
             if (error) {
@@ -200,15 +186,12 @@ function addDepartment() {
             } else {
                 console.table('Success! New Department has been added.', results.rows)
             }
+            displayDepartments();
         })
-
-        // departments.push(newDepartment)
-        // departmentTable.push(newDepartment)
-        // console.log(`The department ${newDepartment.name} has been added.`)
-
-        // console.log(departmentTable.toString())
     })
 }
+
+
 
 
 
@@ -223,7 +206,7 @@ function addRole() {
         {
             name: 'roleDepartment',
             type: 'input',
-            message: "Enter the department the role will be a part of:"
+            message: "Enter the department ID the role will be a part of:"
         },
         {
             name: 'roleSalary',
@@ -253,45 +236,41 @@ function addEmployee() {
 
     inquirer.prompt([
         {
-            name: 'addEmployeeFirstName',
+            name: 'firstName',
             type: 'input',
             message: "Enter the new employee's First Name:",
         },
         {
-            name: 'addEmployeeLastName',
+            name: 'lastName',
             type: 'input',
             message: "Enter the employee's last name:"
         },
         {
-            name: 'addEmployeeRole',
+            name: 'role',
             type: 'input',
-            message: "Enter the employee's role:"
+            message: "Enter the employee's role ID:"
         },
         {
-            name: 'addEmployeeManager',
+            name: 'manager',
             type: 'input',
-            message: "Enter the employee's manager:"
+            message: "Enter the employee's manager ID:"
         }
 
     ]).then((answers) => {
         const newEmployee = {
-            id: employees.length + 1,
-            firstName: answers.employeeFirstName,
-            lastName: answers.employeeLastName,
-            role: answers.employeeRole,
-            manager: answers.employeeManager
+            firstName: answers.firstName,
+            lastName: answers.lastName,
+            role: answers.role,
+            manager: answers.manager
         }
 
-        // roles.push(newEmployee)
-
-        pool.query(`INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ('${newEmployee.firstName}', '${newEmployee.lastName}', '${newEmployee.role}', '${newEmployee.manager}')`, (error, results) => {
+        pool.query(`INSERT INTO employees (first_name, last_name, role_id, manager_id) VALUES ('${newEmployee.firstName}', '${newEmployee.lastName}', ${newEmployee.role}, ${newEmployee.manager})`, (error, results) => {
             if (error) {
                 console.error('Error executing query', error)
             } else {
                 console.table('Success!  New Employee data has been added.', [results.rows])
             }
         })
-        console.log('New employee added!')
     })
 }
 
@@ -310,34 +289,3 @@ function updateRole(employeeId, newRoleId) {
         }
     })
 }
-
-
-
-
-// Calls the Main Menu
-//displayMainMenu();
-
-
-
-
-
-
-// do i need this?
-// const fs = require('fs');
-
-// function executeQueriesFromFile(db, filePath) {
-//     const sqlQueries = fs.readFileSync(filePath, 'utf8').split(';');
-//     sqlQueries.forEach((query) => {
-//         db.query(query, (err, result) => {
-//             if (err) {
-//                 console.error('Error executing query:', err);
-//             } else {
-//                 console.log('Query executed successfully.');
-//             }
-//         });
-//     });
-// }
-
-// module.exports = {
-//     executeQueriesFromFile,
-// };
